@@ -11,82 +11,78 @@ var contacts = [
     chats: [
       {
         "id": 1,
-        message: "dvdfvdfdfdfdf",
+        message: "theres an infinite number of realities Morty, and in a few dozens of those i got lucky and turned everything back to normal",
         "date_sent": new Date("2019-06-21 14:59"),
         "username": "Tony Stark"
       },
       {
         "id": 2,
-        message: "dvdfvdfdfdfdf",
+        message: "Ooh, your little flappy doodles are twitching",
         "date_sent": new Date("2019-06-21 15:15"),
         "username": "Saltanat Alikhanova"
       },
       {
         "id": 3,
-        message: "dvdfvdfdfdfdf",
+        message: "There's pros and cons to every alternate timeline",
         "date_sent": new Date("2019-06-23 15:15"),
         "username": "Tony Stark"
       },
       {
         "id": 4,
-        message: "dvdfvdfdfdfdf",
+        message: "All I wanted was for you to hand me a screwdriver!",
         "date_sent": new Date("2019-06-24 15:20"),
         "username": "Saltanat Alikhanova"
       },
       {
         "id": 5,
-        message: "dvdfvdfdfdfdf",
+        message: "I'm sorry, Morty. It's a bummer.",
         "date_sent": new Date("2019-06-21 16:00"),
         "username": "Tony Stark"
       },
       {
         "id": 6,
-        message: "dvdfvdfdfdfdf",
+        message: "Existence is pain to a meeseeks Jerry",
         "date_sent": new Date("2019-06-25 16:01"),
         "username": "Saltanat Alikhanova"
       },
       {
         "id": 7,
-        message: "dvdfvdfdfdfdf",
+        message: "It's a dream, Morty!",
         "date_sent": new Date("2019-06-26 15:20"),
         "username": "Saltanat Alikhanova"
       },
       {
         "id": 8,
-        message: "dvdfvdfdfdfdf",
+        message: "We're in your dog's dream",
         "date_sent": new Date("2019-06-26 16:00"),
         "username": "Tony Stark"
       },
       {
         "id": 9,
-        message: "dvdfvdfdfdfdf",
+        message: "It's fine, everythings is fine",
         "date_sent": new Date("2019-06-29 16:01"),
         "username": "Saltanat Alikhanova"
       }
     ]
   },
-  { divider: true, inset: true },
   {
     id: 2,
     avatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
     username: 'Bruce Wayne',
     status: "Gotham needs you"
   },
-  { divider: true, inset: true },
   {
     id: 3,
     avatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
     username: 'Carol Danvers',
     status: "On vacation"
   },
-  { divider: true, inset: true },
   {
     id: 4,
     avatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
     username: 'Diana Prince',
     status: "Women runs the world!"
   },
-  { divider: true, inset: true },
   {
     id: 5,
     avatar: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
@@ -100,7 +96,13 @@ localStorage.setItem('contacts', JSON.stringify(contacts));
 var localStorageArrayPush = function(arrayName, item){
   var data = JSON.parse(localStorage.getItem(arrayName));
   data.push(item);
-  local.setItem(arrayName, JSON.stringify(data));
+  localStorage.setItem(arrayName, JSON.stringify(data));
+};
+
+var localStorageArrayUnshift = function(arrayName, item){
+  var data = JSON.parse(localStorage.getItem(arrayName));
+  data.unshift(item);
+  localStorage.setItem(arrayName, JSON.stringify(data));
 };
 
 export default {
@@ -124,7 +126,10 @@ export default {
 	},
 
   addContact(contact){
-    localStorageArrayPush('contacts', contact);
+    contact['id'] = JSON.parse(localStorage.getItem('contacts')).length + 10;
+    contact['avatar'] = 'https://cdn.vuetifyjs.com/images/lists/5.jpg';
+    contact['status'] = "I'm a new user";
+    localStorageArrayUnshift('contacts', contact);
   },
 
   findContact(filter){
@@ -134,13 +139,14 @@ export default {
     var res = [];
     for(var i in _contacts){
       _contact = _contacts[i];
+      success = true;
       for(var j in filter){
-        if(_contact[j] && !_contact[j].startsWith(filter[j])){
+        if(_contact[j] && !_contact[j].toLowerCase().startsWith(filter[j].toLowerCase())){
           success = false;
         }
-        if(success){
-          res.push(_contact);
-        }
+      }
+      if(success){
+        res.push(_contact);
       }
     }
     return res;
@@ -157,7 +163,7 @@ export default {
         break;
       }
     }
-    _contacts.splice(index, 0, contact);
+    _contacts[index] = contact;
     localStorage.setItem('contacts', JSON.stringify(_contacts));
   }
 }

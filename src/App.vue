@@ -5,11 +5,11 @@
         <v-layout row wrap :style="styles.layout">
           <v-flex d-flex xs3 md3 lg3 overflow-y-auto overflow-x-hidden :style="styles.cells">
             <v-layout row wrap>
-              <v-flex d-flex>
-                  <ProfileInfo/>
+              <v-flex xs12 md12 lg12>
+                  <ProfileInfo v-on:contact-added="onContactAdded"/>
               </v-flex>
-              <v-flex d-flex>
-                  <ContactList/>
+              <v-flex xs12 md12 lg12 style="height: -webkit-fill-available;">
+                  <ContactList v-bind:isContactAdded="gotNewContact"/>
               </v-flex>
             </v-layout>
           </v-flex>
@@ -45,7 +45,8 @@ export default {
         cells:{
           height: "100%"
         }
-      }
+      },
+      gotNewContact: false
     }
   },
   methods: {
@@ -53,6 +54,9 @@ export default {
       window.history.length > 1
         ? this.$router.go(-1)
         : this.$router.push('/')
+    },
+    onContactAdded(){
+      this.gotNewContact = true;
     }
   }
 }

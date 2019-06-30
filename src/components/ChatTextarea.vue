@@ -5,14 +5,15 @@
         v-model="message"
         :append-outer-icon="message ? 'mdi-send' : 'mdi-microphone'"
         :prepend-icon="prependedIcon"
-        box
+        solo
         rows="1"
         clear-icon="mdi-close-circle"
         clearable
         :placeholder="placeholder"
         @click:append-outer="sendMessage"
         @click:clear="clearMessage"
-        @keydown.13="sendMessage"
+        @keyup.shift.13.exact="goToNewLine"
+        @keyup.13.exact="sendMessage"
         auto-grow
       ></v-textarea>
     </v-flex>
@@ -30,7 +31,7 @@ const ContactsRepository = RepositoryFactory.get('contacts');
     data: () => ({
       password: 'Password',
       show: false,
-      message: 'Hey!',
+      message: '',
       iconIndex: 0,
       placeholder: 'Write a message',
       prependedIcon: "mdi-paperclip"
@@ -62,6 +63,9 @@ const ContactsRepository = RepositoryFactory.get('contacts');
       },
       clearMessage () {
         this.message = ''
+      },
+      goToNewLine (e) {
+        this.message = this.message + '\n';
       }
     }
   }

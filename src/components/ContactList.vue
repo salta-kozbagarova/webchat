@@ -11,13 +11,11 @@
         <v-list two-line>
           <template v-for="(item, index) in contacts">
             <v-divider
-              v-if="item.divider"
-              :key="index"
-              :inset="item.inset"
+              v-if="index % 2 != 0 && (index+1) < contacts.length"
+              inset
             ></v-divider>
 
             <v-list-tile
-              v-else
               avatar
               v-on:click="goToChat(item)"
             >
@@ -42,10 +40,12 @@ import { RepositoryFactory } from './../repositories/RepositoryFactory.js'
 const ContactsRepository = RepositoryFactory.get('contacts');
 
   export default {
+    props: {
+      isContactAdded: Boolean
+    },
     data () {
       return {
-        contacts: [],
-        loading: false
+        contacts: []
       }
     },
     created () {
@@ -59,9 +59,7 @@ const ContactsRepository = RepositoryFactory.get('contacts');
         this.$router.push({ name: 'chat-container', params: { id: item.id } })
       },
       fetchData () {
-        this.loading = true;
         this.contacts = ContactsRepository.get();
-        this.loading = false;
       },
       searchContacts(event){
         var searchWord = event.target.value;
@@ -69,7 +67,10 @@ const ContactsRepository = RepositoryFactory.get('contacts');
       }
     },
     watch: {
-      '$route': 'fetchData'
+      '$route': 'fetchData',
+      isContactAdded: function (newQuestion, oldQuestion) {
+        this.fetchData();
+      }
     }
   }
 </script>
