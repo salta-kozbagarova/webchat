@@ -2,6 +2,12 @@
   <v-layout row>
     <v-flex xs12 md12 lg12>
       <v-card>
+        <v-text-field
+          solo
+          label="Search"
+          append-icon="search"
+          @keyup="searchContacts"
+        ></v-text-field>
         <v-list two-line>
           <template v-for="(item, index) in contacts">
             <v-divider
@@ -12,9 +18,8 @@
 
             <v-list-tile
               v-else
-              :key="item.username"
               avatar
-              v-on:click="$emit('contact-selected', item)"
+              v-on:click="goToChat(item)"
             >
               <v-list-tile-avatar>
                 <img :src="item.avatar">
@@ -33,84 +38,38 @@
 </template>
 
 <script>
+import { RepositoryFactory } from './../repositories/RepositoryFactory.js'
+const ContactsRepository = RepositoryFactory.get('contacts');
+
   export default {
     data () {
       return {
-        contacts: [
-          {
-            avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
-            username: 'Tony Stark',
-            status: "Where's my Jarvis?",
-            chats: [
-              {
-                "id": 1,
-                message: "dvdfvdfdfdfdf",
-                "date_sent": new Date("2019-06-21 14:59"),
-                "username": "Tony Stark"
-              },
-              {
-                "id": 2,
-                message: "dvdfvdfdfdfdf",
-                "date_sent": new Date("2019-06-21 15:15"),
-                "username": "Saltanat Alikhanova"
-              },
-              {
-                "id": 3,
-                message: "dvdfvdfdfdfdf",
-                "date_sent": new Date("2019-06-23 15:15"),
-                "username": "Tony Stark"
-              },
-              {
-                "id": 4,
-                message: "dvdfvdfdfdfdf",
-                "date_sent": new Date("2019-06-24 15:20"),
-                "username": "Saltanat Alikhanova"
-              },
-              {
-                "id": 5,
-                message: "dvdfvdfdfdfdf",
-                "date_sent": new Date("2019-06-21 16:00"),
-                "username": "Tony Stark"
-              },
-              {
-                "id": 6,
-                message: "dvdfvdfdfdfdf",
-                "date_sent": new Date("2019-06-25 16:01"),
-                "username": "Saltanat Alikhanova"
-              }
-            ]
-          },
-          { divider: true, inset: true },
-          {
-            avatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
-            username: 'Bruce Wayne',
-            status: "Gotham needs you"
-          },
-          { divider: true, inset: true },
-          {
-            avatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
-            username: 'Carol Danvers',
-            status: "On vacation"
-          },
-          { divider: true, inset: true },
-          {
-            avatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
-            username: 'Diana Prince',
-            status: "Women runs the world!"
-          },
-          { divider: true, inset: true },
-          {
-            avatar: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
-            username: 'Xena',
-            status: "I'm a warrior princess"
-          }
-        ]
+        contacts: [],
+        loading: false
       }
+    },
+    created () {
+      this.fetchData()
     },
     methods: {
       openChat: function(event){
         console.log('contact was clicked');
+      },
+      goToChat(item){
+        this.$router.push({ name: 'chat-container', params: { id: item.id } })
+      },
+      fetchData () {
+        this.loading = true;
+        this.contacts = ContactsRepository.get();
+        this.loading = false;
+      },
+      searchContacts(event){
+        var searchWord = event.target.value;
+        this.contacts = ContactsRepository.findContact({'username': searchWord});
       }
+    },
+    watch: {
+      '$route': 'fetchData'
     }
   }
 </script>

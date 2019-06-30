@@ -1,47 +1,42 @@
 <template>
   <v-layout row wrap align-end>
-    <v-flex d-flex xs12 md12 lg12>
-        <v-textarea
-          v-model="message"
-          :append-outer-icon="message ? 'mdi-send' : 'mdi-microphone'"
-          :prepend-icon="icon"
-          box
-          rows="1"
-          clear-icon="mdi-close-circle"
-          clearable
-          :placeholder="placeholder"
-          @click:append-outer="sendMessage"
-          @click:clear="clearMessage"
-          auto-grow
-    ></v-textarea>
+    <v-flex d-flex xs8 md8 lg8 offset-md2>
+      <v-textarea
+        v-model="message"
+        :append-outer-icon="message ? 'mdi-send' : 'mdi-microphone'"
+        :prepend-icon="prependedIcon"
+        box
+        rows="1"
+        clear-icon="mdi-close-circle"
+        clearable
+        :placeholder="placeholder"
+        @click:append-outer="sendMessage"
+        @click:clear="clearMessage"
+        @keydown.13="sendMessage"
+        auto-grow
+      ></v-textarea>
     </v-flex>
   </v-layout>
 </template>
 
 <script>
+import { RepositoryFactory } from './../repositories/RepositoryFactory.js'
+const ContactsRepository = RepositoryFactory.get('contacts');
+
   export default {
+    props: {
+      contact: Object
+    },
     data: () => ({
       password: 'Password',
       show: false,
       message: 'Hey!',
       iconIndex: 0,
       placeholder: 'Write a message',
-      icons: [
-        'mdi-emoticon',
-        'mdi-emoticon-cool',
-        'mdi-emoticon-dead',
-        'mdi-emoticon-excited',
-        'mdi-emoticon-happy',
-        'mdi-emoticon-neutral',
-        'mdi-emoticon-sad',
-        'mdi-emoticon-tongue'
-      ]
+      prependedIcon: "mdi-paperclip"
     }),
 
     computed: {
-      icon () {
-        return this.icons[this.iconIndex]
-      }
     },
 
     methods: {
@@ -49,19 +44,24 @@
         this.marker = !this.marker
       },
       sendMessage () {
-        this.resetIcon()
+        if(!this.message || this.message.length == 0)
+          return false;
+        this.contact.chats = this.contact.chats || [];
+        var newId = this.contact.chats.length + 1;
+        this.contact.chats.push(
+          {
+            "id": newId,
+            message: this.message,
+            "date_sent": new Date(),
+            "username": "Saltanat Alikhanova"
+          }
+        );
+        ContactsRepository.updateContact(this.contact.id, this.contact);
+        this.$emit('chats-changed', this.contact.chats);
         this.clearMessage()
       },
       clearMessage () {
         this.message = ''
-      },
-      resetIcon () {
-        this.iconIndex = 0
-      },
-      changeIcon () {
-        this.iconIndex === this.icons.length - 1
-          ? this.iconIndex = 0
-          : this.iconIndex++
       }
     }
   }
